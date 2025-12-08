@@ -28,9 +28,10 @@ Para que o jogo funcione corretamente, é essencial que as imagens estejam na pa
 
 ```text
 /
-├── game.py    # Código principal do jogo
+├── requirements.txt    # Arquivo com as dependências do projeto
+├── game.py             # Código principal do jogo
 ├── README.md            
-├── images/              # Pasta para sprites
+├── images/             # Pasta para sprites
 │   ├── player_idle.png
 │   ├── player_run1.png
 │   ├── player_run2.png
@@ -38,7 +39,7 @@ Para que o jogo funcione corretamente, é essencial que as imagens estejam na pa
 │   ├── btn_start.png
 │   ├── btn_sound.png
 │   └── btn_exit.png
-└── sounds/              # Pasta opcional para áudio
+└── sounds/              # Pasta para áudio
     ├── music.mp3
     └── hit.wav
 ```
