@@ -18,7 +18,7 @@
 
 ## 🛠️ Pré-requisitos
 
-Para rodar este projeto, você precisa ter o **Python 3.x** instalado.
+Para rodar este projeto, você precisa ter o **Python 3.11** instalado (importante: a versão 3.14 não funciona para esse projeto).
 
 As dependências principais são:
 - `pgzero`
@@ -50,9 +50,10 @@ A estrutura de pastas é **estrita** devido aos requisitos do Pygame Zero. Certi
 ## 🚀 Como Executar
 
 Clone o repositório ou baixe os arquivos.Abra o terminal na pasta raiz do projeto.
-Passo 1: Criar e ativar o ambiente virtual (Recomendado)Bash# Windows
+Passo 1: Criar e ativar o ambiente virtual (Recomendado)
 
 ```bash
+# Windows
 python -m venv venv
 .\venv\Scripts\activate
 ```
@@ -69,7 +70,10 @@ Passo 3: Rodar o jogo
 ```bash
 pgzrun game.py
 ```
-🕹️ ControlesTecla / AçãoFunçãoSetas DirecionaisMover o personagem (Cima, Baixo, Esq, Dir)Mouse (Clique)Interagir com botões do Menu (Start, Sound, Exit)Espaço (Space)Voltar ao Menu após Vitória ou Game Over🧠 
+## 🕹️ Controles/Tecla 
+Setas: move o personagem (Cima, Baixo, Esq, Dir)
+Mouse (Clique): Interagir com botões do Menu (Start, Sound, Exit)
+Espaço (Space): Voltar ao Menu após Vitória ou Game Over🧠 
 
 ## 🧠 Lógica do Código
 O projeto utiliza Programação Orientada a Objetos (POO):
