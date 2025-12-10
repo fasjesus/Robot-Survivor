@@ -2,9 +2,10 @@ import pgzero
 import math
 import random
 from pygame import Rect
+from pgzero.actor import Actor
 
 # --- CONSTANTS (PEP8: Uppercase for constants) ---
-WIDTH = 800
+WIDTH = 770
 HEIGHT = 640
 TILE_SIZE = 64
 TITLE = "Space Survivor - Roguelike Exam"
@@ -28,17 +29,18 @@ ASSETS_MAP = {
     "X": "ground_02"    # Exit/Goal
 }
 
-# Level Design (10x10 grid suitable for 800x640 with margins)
+# Level Design (13x10 grid suitable for 770x640 with margins)
 MAP_LAYOUT = [
-    "WWWWWWWWWW",
-    "W........W",
-    "W..P.....W",
-    "W...WW...W",
-    "W...W....W",
-    "W......E.W",
-    "W..E.....W",
-    "W...W....W",
-    "WWWWWWWWWW"
+    "WWWWWWWWWWWW",
+    "W..........W",
+    "W..P.......W",
+    "W...WW.....W",
+    "W..........W",
+    "W......E...W",
+    "W..E.......W",
+    "W..........W",
+    "W.......X..W",
+    "WWWWWWWWWWWW"
 ]
 
 # --- CLASSES ---
@@ -128,12 +130,20 @@ class Player(GameSprite):
         return False
 
 class Enemy(GameSprite):
+    def __init__(self, img_idle, img_walk, grid_x, grid_y):
+        # Chama o init original da classe pai
+        super().__init__(img_idle, img_walk, grid_x, grid_y)
+        # Adiciona um contador de turnos interno para o inimigo
+        self.move_counter = 0
+
     def ai_turn(self, player_target, walls):
-        """Simple AI: Try horizontal, then vertical."""
         if self.is_moving:
             return
 
-        # Calculate direction
+        self.move_counter += 1
+        
+        if self.move_counter % 2 != 0:
+            return
         dx = 0
         dy = 0
         
