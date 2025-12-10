@@ -1,10 +1,7 @@
-import pgzero
-import math
-import random
 from pygame import Rect
 from pgzero.actor import Actor
 
-# --- CONSTANTS (PEP8: Uppercase for constants) ---
+# --- CONSTANTS ---
 WIDTH = 770
 HEIGHT = 640
 TILE_SIZE = 64
@@ -130,10 +127,9 @@ class Player(GameSprite):
         return False
 
 class Enemy(GameSprite):
+
     def __init__(self, img_idle, img_walk, grid_x, grid_y):
-        # Chama o init original da classe pai
         super().__init__(img_idle, img_walk, grid_x, grid_y)
-        # Adiciona um contador de turnos interno para o inimigo
         self.move_counter = 0
 
     def ai_turn(self, player_target, walls):
@@ -222,19 +218,18 @@ def update():
     
     # Music Control
     if sound_enabled:
-        if not music.is_playing('music_bg'): # Ensure 'music_bg.mp3' exists
+        if not music.is_playing('music_bg'): 
             try:
                 music.play('music_bg')
             except:
-                pass # Fail silently if no file
+                pass 
     else:
         music.stop()
 
     if game_state == "playing":
         player.animate()
         player.update_smooth_movement()
-        
-        # Check Win Condition
+
         if (player.grid_x, player.grid_y) == exit_pos:
             game_state = "victory"
 
