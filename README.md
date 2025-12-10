@@ -1,76 +1,94 @@
-# 💥 Space Survivor
+# 💥 Robot Survivor 
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![Pygame Zero](https://img.shields.io/badge/Engine-Pygame%20Zero-red)
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/Status-Finalizado-green)
 
-**Space Survivor** é um jogo 2D de sobrevivência desenvolvido em Python utilizando a biblioteca **Pygame Zero**. O objetivo é simples: controlar o **Player** e sobreviver o maior tempo possível evitando as **Threats** (ameaças) que perseguem o jogador implacavelmente.
+**Robot Survivor** é um jogo do gênero **Roguelike** desenvolvido em Python utilizando a engine **Pygame Zero**. O jogo apresenta uma mecânica de movimentação baseada em grade (grid-based), onde o jogador deve navegar por um mapa, evitar inimigos com inteligência artificial de perseguição e alcançar a saída.
 
 ## 🎮 Funcionalidades
 
-- **Movimentação:** Controle o personagem usando as setas do teclado ou W/A/S/D.
-- **Sistema de Ameaças:** Inimigos ("Threats") com IA de perseguição básica que aumentam em número conforme o tempo passa.
-- **Pontuação Progressiva:** O score aumenta baseado no tempo de sobrevivência.
-- **Interface de Menu:** Menu inicial com opções de Iniciar, Controle de Som e Sair.
-- **Animação de Sprites:** O jogador possui animação de corrida e estado "idle".
+- **Sistema de Turnos:** Os inimigos só se movem quando o jogador se move, permitindo planejamento estratégico.
+- **Movimentação em Grade:** Movimento preciso tile-a-tile com animação suave (smooth movement).
+- **Animação de Sprites:** Personagens possuem animações distintas para os estados "Idle" (Parado/Respirando) e "Walk" (Andando).
+- **Áudio Imersivo:** - Trilha sonora de fundo (BGM) em loop.
+  - Efeitos sonoros (SFX) para passos, vitórias, derrotas e cliques.
+  - Botão Mute no menu.
+- **Level Design:** Mapa construído dinamicamente a partir de uma matriz de texto.
 
 ## 🛠️ Pré-requisitos
 
-Para rodar este projeto, você precisa ter o **Python** instalado e a biblioteca **Pygame Zero**.
+Para rodar este projeto, você precisa ter o **Python 3.x** instalado.
 
-```bash
-pip install -r requirements.txt
-```
+As dependências principais são:
+- `pgzero`
+- `pygame` (apenas para usar o Rect)
 
 ## 📂 Estrutura de Arquivos
 
-Para que o jogo funcione corretamente, é essencial que as imagens estejam na pasta `images` e os sons na pasta `sounds`.
+A estrutura de pastas é **estrita** devido aos requisitos do Pygame Zero. Certifique-se de que os arquivos estejam organizados desta forma:
 
 ```text
 /
-├── requirements.txt    # Arquivo com as dependências do projeto
-├── game.py             # Código principal do jogo
-├── README.md            
-├── images/             # Pasta para sprites
-│   ├── player_idle.png
-│   ├── player_run1.png
-│   ├── player_run2.png
-│   ├── threat.png       
-│   ├── btn_start.png
-│   ├── btn_sound.png
-│   └── btn_exit.png
-└── sounds/              # Pasta para áudio
-    ├── music.mp3
-    └── hit.wav
+├── requirements.txt      # Dependências (pgzero)
+├── game.py               # Código principal (Lógica, Classes, Loops)
+├── README.md             
+├── images/               # Sprites 
+│   ├── character_robot_idle.png
+│   ├── character_robot_walk0.png
+│   ├── character_zombie_idle.png
+│   ├── block_06.png
+│   └── ... (outros assets visuais)
+├── sounds/               # Efeitos sonoros curtos (.ogg)
+│   ├── click.ogg
+│   ├── hit.ogg
+│   ├── victory.ogg
+│   └── gameover.ogg
+└── music/                # Música de fundo longa
+    └── music.ogg
 ```
-
 ## 🚀 Como Executar
 
-1.  Clone este repositório ou baixe os arquivos preservando a estrutura de pastas.
-2.  Abra o terminal na pasta do projeto e execute:
+Clone o repositório ou baixe os arquivos.Abra o terminal na pasta raiz do projeto.
+Passo 1: Criar e ativar o ambiente virtual (Recomendado)Bash# Windows
 
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+```
+```bash
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+```
+Passo 2: Instalar dependências
+```bash
+pip install -r requirements.txt
+```
+Passo 3: Rodar o jogo
 ```bash
 pgzrun game.py
 ```
-
-## 🕹️ Controles
-
-| Tecla | Ação |
-| :--- | :--- |
-| **W / Seta Cima** | Mover para Cima |
-| **S / Seta Baixo** | Mover para Baixo |
-| **A / Seta Esquerda** | Mover para Esquerda |
-| **D / Seta Direita** | Mover para Direita |
-| **Mouse (Clique)** | Interagir com Botões do Menu |
+🕹️ ControlesTecla / AçãoFunçãoSetas DirecionaisMover o personagem (Cima, Baixo, Esq, Dir)Mouse (Clique)Interagir com botões do Menu (Start, Sound, Exit)Espaço (Space)Voltar ao Menu após Vitória ou Game Over🧠 
 
 ## 🧠 Lógica do Código
+O projeto utiliza Programação Orientada a Objetos (POO):
 
-O projeto segue os princípios de Orientação a Objetos:
+Classe GameSprite(Actor): Classe mãe que gerencia a lógica comum a todos os personagens, como interpolação de movimento (para não "pular" de um quadrado para outro instantaneamente) e o sistema de animação de frames.
 
-  - **Classe `Player`:** Gerencia a posição, colisão e animação do personagem.
-  - **Classe `Threat`:** Gerencia o comportamento de perseguição (`chase logic`) utilizando vetores para calcular a direção do jogador.
+Classe Player: Herda de GameSprite. Implementa a lógica de colisão com paredes e detecção de vitória.
 
-## 📝 Autor
+Classe Enemy: Herda de GameSprite. Implementa uma IA simples que calcula a distância até o jogador e tenta encurtá-la a cada turno.
 
-Desenvolvido por **Flávia Jesus**.
+Sistema de Mapa: O mapa é renderizado iterando sobre a lista MAP_LAYOUT, onde:
 
+W = Parede (Wall)
+
+P = Ponto de partida do Jogador
+
+E = Inimigo (Enemy)
+
+X = Saída/Objetivo
+
+## Autoria
+Desenvolvido por Flávia Jesus.

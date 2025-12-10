@@ -5,18 +5,18 @@ from pgzero.actor import Actor
 WIDTH = 770
 HEIGHT = 640
 TILE_SIZE = 64
-TITLE = "Space Survivor - Roguelike Exam"
+TITLE = "Robot Survivor"
 
 # --- GLOBAL VARIABLES ---
-game_state = "menu"  # Options: 'menu', 'playing', 'game_over', 'victory'
+game_state = "menu" 
 sound_enabled = True
 
 # --- ASSETS CONFIGURATION ---
-PLAYER_IDLE = ['character_robot_idle']
 PLAYER_WALK = ['character_robot_walk0', 'character_robot_walk1']
+PLAYER_IDLE = ['character_robot_idle', 'character_robot_walk0'] 
 
-ENEMY_IDLE = ['character_zombie_idle']
 ENEMY_WALK = ['character_zombie_walk0', 'character_zombie_walk1']
+ENEMY_IDLE = ['character_zombie_idle', 'character_zombie_walk0']
 
 # Map Dictionary
 ASSETS_MAP = {
@@ -26,7 +26,7 @@ ASSETS_MAP = {
     "X": "ground_02"    # Exit/Goal
 }
 
-# Level Design (13x10 grid suitable for 770x640 with margins)
+# Level Design (13x10 grid)
 MAP_LAYOUT = [
     "WWWWWWWWWWWW",
     "W..........W",
@@ -41,47 +41,44 @@ MAP_LAYOUT = [
 ]
 
 # --- CLASSES ---
-
 class GameSprite(Actor):
 
     def __init__(self, img_idle, img_walk, grid_x, grid_y):
         super().__init__(img_idle[0])
         self.grid_x = grid_x
         self.grid_y = grid_y
-        
-        # Visual position (pixel based)
         self.pos = (grid_x * TILE_SIZE + 32, grid_y * TILE_SIZE + 32)
         
-        # Movement logic
         self.target_x = self.x
         self.target_y = self.y
         self.is_moving = False
         self.speed = 4
         
-        # Animation data
         self.anim_idle = img_idle
         self.anim_walk = img_walk
         self.anim_timer = 0
         self.frame_index = 0
 
     def animate(self):
-       
         self.anim_timer += 1
         
         if self.is_moving:
             frames = self.anim_walk
-            delay = 5  # Fast change when running
+            delay = 5 
         else:
             frames = self.anim_idle
-            delay = 20 # Slow breathing when idle
+            delay = 20
             
         if self.anim_timer > delay:
             self.anim_timer = 0
-            self.frame_index = (self.frame_index + 1) % len(frames)
-            self.image = frames[self.frame_index]
+            self.frame_index += 1
+            
+        if self.frame_index >= len(frames):
+            self.frame_index = 0
+            
+        self.image = frames[self.frame_index]
 
     def update_smooth_movement(self):
-     
         if not self.is_moving:
             return
 
@@ -95,7 +92,6 @@ class GameSprite(Actor):
         elif self.y > self.target_y:
             self.y -= self.speed
 
-        # Check if reached target (snap to grid)
         dist_x = abs(self.x - self.target_x)
         dist_y = abs(self.y - self.target_y)
         
@@ -107,7 +103,6 @@ class GameSprite(Actor):
 class Player(GameSprite):
 
     def attempt_move(self, dx, dy, walls):
-       
         if self.is_moving:
             return False
             
@@ -122,7 +117,8 @@ class Player(GameSprite):
             self.is_moving = True
             
             if sound_enabled:
-                pass 
+                try: sounds.hit.play()
+                except: pass
             return True
         return False
 
@@ -169,46 +165,42 @@ class Enemy(GameSprite):
 # --- GAME SETUP ---
 
 walls = []
+wall_actors = []
 enemies = []
 floor_tiles = []
 player = None
 exit_pos = None
 
-# Menu Hitboxes (Using Rect for clickable areas)
 btn_start_rect = Rect((WIDTH//2 - 100, 200), (200, 50))
 btn_sound_rect = Rect((WIDTH//2 - 100, 300), (200, 50))
 btn_exit_rect  = Rect((WIDTH//2 - 100, 400), (200, 50))
 
 def setup_level():
-    """Parses the map layout and creates objects."""
-    global player, exit_pos, walls, enemies, floor_tiles
+    global player, exit_pos, walls, enemies, floor_tiles, wall_actors
     
     walls.clear()
+    wall_actors.clear()
     enemies.clear()
     floor_tiles.clear()
 
     for row_idx, row_data in enumerate(MAP_LAYOUT):
         for col_idx, char in enumerate(row_data):
-            
-            # Position calculation
             x = col_idx * TILE_SIZE + 32
             y = row_idx * TILE_SIZE + 32
             
-            # Always add floor
             floor_tiles.append(Actor(ASSETS_MAP["."], pos=(x, y)))
             
             if char == "W":
                 walls.append((col_idx, row_idx))
+                wall_actors.append(Actor(ASSETS_MAP["W"], pos=(x, y)))
             elif char == "P":
                 player = Player(PLAYER_IDLE, PLAYER_WALK, col_idx, row_idx)
             elif char == "E":
                 enemies.append(Enemy(ENEMY_IDLE, ENEMY_WALK, col_idx, row_idx))
             elif char == "X":
                 exit_pos = (col_idx, row_idx)
-                # Visual marker for exit
                 floor_tiles.append(Actor(ASSETS_MAP["X"], pos=(x, y)))
 
-# Initialize level once
 setup_level()
 
 # --- PGZERO EVENTS ---
@@ -217,12 +209,11 @@ def update():
     global game_state
     
     # Music Control
-    if sound_enabled:
-        if not music.is_playing('music_bg'): 
-            try:
-                music.play('music_bg')
-            except:
-                pass 
+    if sound_enabled and game_state in ["menu", "playing"]:
+        music.set_volume(0.3)
+        if not music.is_playing('music'): 
+            music.play('music')
+             
     else:
         music.stop()
 
@@ -230,15 +221,22 @@ def update():
         player.animate()
         player.update_smooth_movement()
 
+        # VICTORY CHECK
         if (player.grid_x, player.grid_y) == exit_pos:
+            if sound_enabled:
+                try: sounds.victory.play()
+                except: pass
             game_state = "victory"
 
         for enemy in enemies:
             enemy.animate()
             enemy.update_smooth_movement()
             
-            # Check Collision (Game Over)
+            # GAME OVER CHECK
             if enemy.grid_x == player.grid_x and enemy.grid_y == player.grid_y:
+                if sound_enabled:
+                    try: sounds.gameover.play()
+                    except: pass
                 game_state = "game_over"
 
 def draw():
@@ -258,53 +256,57 @@ def draw():
 def draw_game():
     for tile in floor_tiles:
         tile.draw()
-        
-    for wall_x, wall_y in walls:
-        screen.blit(ASSETS_MAP["W"], (wall_x * TILE_SIZE, wall_y * TILE_SIZE))
-        
+    for wall in wall_actors:
+        wall.draw() 
     player.draw()
     for enemy in enemies:
         enemy.draw()
 
 def draw_menu():
-    screen.draw.text("SPACE SURVIVOR", center=(WIDTH//2, 100), fontsize=60, color="cyan")
+    screen.draw.text("ROBOT SURVIVOR", center=(WIDTH//2, 100), fontsize=60, color="cyan")
     
-    # Draw Buttons
-    # Start
     screen.draw.filled_rect(btn_start_rect, "blue")
     screen.draw.text("START GAME", center=btn_start_rect.center, fontsize=30)
     
-    # Sound
     color = "green" if sound_enabled else "red"
     text = "SOUND: ON" if sound_enabled else "SOUND: OFF"
     screen.draw.filled_rect(btn_sound_rect, color)
     screen.draw.text(text, center=btn_sound_rect.center, fontsize=30)
     
-    # Exit
     screen.draw.filled_rect(btn_exit_rect, "gray")
     screen.draw.text("EXIT", center=btn_exit_rect.center, fontsize=30)
 
 def on_mouse_down(pos):
     global game_state, sound_enabled
-    
+ 
     if game_state == "menu":
         if btn_start_rect.collidepoint(pos):
-            setup_level() # Reset game
+            if sound_enabled:
+                try: sounds.click.play()
+                except: pass
+            setup_level()
             game_state = "playing"
+            
         elif btn_sound_rect.collidepoint(pos):
+            if sound_enabled:
+                try: sounds.click.play()
+                except: pass
             sound_enabled = not sound_enabled
+            
         elif btn_exit_rect.collidepoint(pos):
-            quit()
+            if sound_enabled:
+                try: sounds.click.play()
+                except: pass
+            try: quit()
+            except: exit()
 
 def on_key_down(key):
     global game_state
     
-    # Return to menu from end screens
     if game_state in ["game_over", "victory"]:
         if key == keys.SPACE:
             game_state = "menu"
             
-    # Movement inputs (Turn Based)
     elif game_state == "playing" and not player.is_moving:
         moved = False
         if key == keys.LEFT:  moved = player.attempt_move(-1, 0, walls)
@@ -312,7 +314,6 @@ def on_key_down(key):
         elif key == keys.UP:    moved = player.attempt_move(0, -1, walls)
         elif key == keys.DOWN:  moved = player.attempt_move(0, 1, walls)
         
-        # Turn System: If player moved, enemies move
         if moved:
             for enemy in enemies:
                 enemy.ai_turn(player, walls)
