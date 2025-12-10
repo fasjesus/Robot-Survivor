@@ -70,10 +70,10 @@ Passo 3: Rodar o jogo
 ```bash
 pgzrun game.py
 ```
-## 🕹️ Controles/Tecla 
-Setas: move o personagem (Cima, Baixo, Esq, Dir)
-Mouse (Clique): Interagir com botões do Menu (Start, Sound, Exit)
-Espaço (Space): Voltar ao Menu após Vitória ou Game Over🧠 
+## 🕹️ Controles/Teclas 
+- **Setas:** move o personagem (Cima, Baixo, Esq, Dir)
+- **Mouse (Clique):** Interagir com botões do Menu (Start, Sound, Exit)
+- **Espaço (Space):** Voltar ao Menu após Vitória ou Game Over🧠 
 
 ## 🧠 Lógica do Código
 O projeto utiliza Programação Orientada a Objetos (POO):
